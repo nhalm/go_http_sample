@@ -11,19 +11,21 @@ import (
 
 type Pharmacy struct {
 	Id        int    `json:"id"`
-	Client_id int    `json:"client_id"`
+	Client_id int    `json:"clientId"`
 	Name      string `json:"name"`
 }
 
 type GenericError struct {
-	Msg string `json:"msg"`
-	Ids []int  `json:"ids"`
+	DevMsg    string `json:"devMsg"`
+	UserMsg   string `json:"userMsg"`
+	ErrorCode string `json:"errorCode`
 }
 
-func NewGenericError(msg string, ids []int) *GenericError {
+func NewGenericError(devMsg, userMsg, errorCode string) *GenericError {
 	return &GenericError{
-		Msg: msg,
-		Ids: ids,
+		DevMsg:    devMsg,
+		UserMsg:   userMsg,
+		ErrorCode: errorCode,
 	}
 }
 
@@ -57,7 +59,8 @@ func Add_update_pharmacy(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	// how we can handle an error
 	if p.Client_id == 0 {
 		w.WriteHeader(400)
-		j, _ := json.Marshal(NewGenericError("client_id is invalid", nil))
+		devMsg := fmt.Sprintf("The clientId: %d is not a registered clientId.  Please submit a registered clientId to complete operation", p.Client_id)
+		j, _ := json.Marshal(NewGenericError(devMsg, "Invalid clientId", ""))
 		fmt.Fprintf(w, "%s", j)
 		return
 	}
